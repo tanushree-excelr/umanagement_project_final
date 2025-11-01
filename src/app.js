@@ -10,3 +10,4 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 
 module.exports = app; 
+// Export app for server.js and testing
