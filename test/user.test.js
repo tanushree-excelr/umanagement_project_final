@@ -31,3 +31,4 @@ describe("User API", () => {
     expect(res.statusCode).toBe(200);
   });
 });
+//this is jest file for testing user routes
