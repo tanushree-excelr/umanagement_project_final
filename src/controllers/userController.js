@@ -1,24 +1,22 @@
-const User = require("../models/User");
+const User = require('../models/userModel');
 
-// Create User
-const createUser = async (req, res) => {
+// CREATE user
+exports.createUser = async (req, res) => {
   try {
-    const { name, email, username } = req.body;
-
-    if (!name || !email || !username) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { name, email, username, password } = req.body;
+    if (!name || !email || !username || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const user = new User({ name, email, username });
-    await user.save();
-    res.status(201).json({ message: "User created successfully", user });
+    const user = await User.create({ name, email, username, password });
+    res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// Get all users
-const getUsers = async (req, res) => {
+// GET all users
+exports.getUsers = async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -27,54 +25,39 @@ const getUsers = async (req, res) => {
   }
 };
 
-// Get single user by ID
-const getUserById = async (req, res) => {
+// GET user by ID
+exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: 'Invalid user ID' });
   }
 };
 
-// PUT - Full update
-const updateUser = async (req, res) => {
+// PATCH - update user
+exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      overwrite: true,
-      runValidators: true,
-    });
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.status(200).json({ message: "User updated successfully", user });
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: 'Invalid user ID' });
   }
 };
 
-// PATCH - Partial update
-const patchUser = async (req, res) => {
+// DELETE user
+exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.status(200).json({ message: "User partially updated", user });
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: 'Invalid user ID' });
   }
-};
-
-module.exports = {
-  createUser,
-  getUsers,
-  getUserById,
-  updateUser,
-  patchUser,
 };

@@ -1,16 +1,21 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db");
+const express = require('express');
+const dotenv = require('dotenv');
+const connectDB = require('./src/config/db');
+const userRoutes = require('./src/routes/userRoutes');
+const mongoose = require('mongoose');
 
 dotenv.config();
-
-const app = express();
 connectDB();
 
+const app = express();
 app.use(express.json());
 
-const userRoutes = require("./src/routes/userRoutes");
-app.use("/api/users", userRoutes);
+app.use('/api', userRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app; // export for testing
+module.exports.mongoose = mongoose;
